@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { text-align: center; color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Nota de Venta</h1>
+  <p><b>Cliente:</b> {{ nota.venta.cliente.cliente.nombre }}</p>
+  <p><b>Email:</b> {{ nota.venta.cliente.cliente.email }}</p>
+  <p><b>Fecha:</b> {{ nota.fecha }}</p>
+  <p><b>NIT:</b> {{ nota.nit }}</p>
+  <hr>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Precio Unitario</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for detalle in nota.venta.detalles.all %}
+      <tr>
+        <td>{{ detalle.producto.nombre }}</td>
+        <td>{{ detalle.precio_unitario }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 style="text-align:right;">Total: Bs {{ nota.monto }}</h3>
+
+  <div class="footer">
+    <p>Gracias por su compra — SmartSales365 © {{ nota.fecha|date:"Y" }}</p>
+  </div>
+</body>
+</html>
