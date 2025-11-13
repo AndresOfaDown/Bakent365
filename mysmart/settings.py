@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from decouple import config, Csv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j3zbsn8*9u9h%&ty*n8&*)%5@z=q2$4ygn-zs#&lc-jm77i-&h'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-j3zbsn8*9u9h%&ty*n8&*)%5@z=q2$4ygn-zs#&lc-jm77i-&h')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
 
 # Application definition
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir archivos estáticos en producción
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -85,16 +88,26 @@ WSGI_APPLICATION = 'mysmart.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',  # El nombre de la base de datos en Railway
-        'USER': 'postgres',  # El nombre de usuario
-        'PASSWORD': 'oUeYtCOemxMGHbibfebAqSRtTqVskYzl',  # La contraseña
-        'HOST': 'trolley.proxy.rlwy.net',  # El host proporcionado por Railway
-        'PORT': '37493',  # El puerto de conexión
+# Configuración de base de datos con soporte para variables de entorno
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
+    # Usar DATABASE_URL de Railway u otro servicio (producción)
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
     }
-}
+else:
+    # Configuración local/desarrollo con valores individuales
+    DATABASES = {
+        'default': {
+            'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
+            'NAME': config('DB_NAME', default='railway'),
+            'USER': config('DB_USER', default='postgres'),
+            'PASSWORD': config('DB_PASSWORD', default='oUeYtCOemxMGHbibfebAqSRtTqVskYzl'),
+            'HOST': config('DB_HOST', default='trolley.proxy.rlwy.net'),
+            'PORT': config('DB_PORT', default='37493'),
+        }
+    }
 
 
 
@@ -134,7 +147,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Configuración de WhiteNoise para servir archivos estáticos
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -170,11 +187,12 @@ SIMPLE_JWT = {
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # React con Vite
-    "http://localhost:3000",  # React con CRA
-    "http://127.0.0.1:5173",  # React con Vite (127.0.0.1)
-]
+# Configuración de CORS
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173',
+    cast=Csv()
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -192,3 +210,19 @@ CORS_ALLOW_HEADERS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Configuración de seguridad para producción
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# Configuración de Stripe desde variables de entorno
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='sk_test_51SOpP3D9rf9HDuNtlFTbuMSNpxtCON5rsRaXSwW4OcUOgpMs07YVesOBj7H95R9STFVtUWweMd1TW5cFOt1f6i8B00MOUL08zX')
+STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='pk_test_51SOpP3D9rf9HDuNt9TsnKuj0utwp2knkDjBsK4yTzYiUiPgDVPXLul7OjzJo4Ay7Qeh8p47bFsOJiDsAJPay4X9d00b6hzbYm7')

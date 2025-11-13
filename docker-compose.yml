@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: railway
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             gunicorn mysmart.wsgi:application --bind 0.0.0.0:8000 --workers 3 --reload"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-local-dev-key
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/railway
+      - STRIPE_SECRET_KEY=sk_test_51SOpP3D9rf9HDuNtlFTbuMSNpxtCON5rsRaXSwW4OcUOgpMs07YVesOBj7H95R9STFVtUWweMd1TW5cFOt1f6i8B00MOUL08zX
+      - STRIPE_PUBLIC_KEY=pk_test_51SOpP3D9rf9HDuNt9TsnKuj0utwp2knkDjBsK4yTzYiUiPgDVPXLul7OjzJo4Ay7Qeh8p47bFsOJiDsAJPay4X9d00b6hzbYm7
+      - CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

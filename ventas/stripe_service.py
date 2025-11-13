@@ -2,8 +2,8 @@
 import stripe
 from django.conf import settings
 
-# Configurar Stripe con la clave secreta
-stripe.api_key = "sk_test_51SOpP3D9rf9HDuNtlFTbuMSNpxtCON5rsRaXSwW4OcUOgpMs07YVesOBj7H95R9STFVtUWweMd1TW5cFOt1f6i8B00MOUL08zX"
+# Configurar Stripe con la clave secreta desde settings
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 print(f"🔑 Stripe API Key configurada: {stripe.api_key[:20]}...{stripe.api_key[-4:]}")
 
