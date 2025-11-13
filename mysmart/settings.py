@@ -88,13 +88,15 @@ WSGI_APPLICATION = 'mysmart.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sales365',        #  nombre de tu base de datos
-        'USER': 'postgres',              # tu usuario de PostgreSQL
-        'PASSWORD': 'muerte',     # tu contraseña
-        'HOST': 'localhost',             # o IP de tu servidor
-        'PORT': '5432',                  #  puerto por defecto de PostgreSQL
+        'NAME': 'railway',  # El nombre de la base de datos en Railway
+        'USER': 'postgres',  # El nombre de usuario
+        'PASSWORD': 'oUeYtCOemxMGHbibfebAqSRtTqVskYzl',  # La contraseña
+        'HOST': 'trolley.proxy.rlwy.net',  # El host proporcionado por Railway
+        'PORT': '37493',  # El puerto de conexión
     }
 }
+
+
 
 
 
