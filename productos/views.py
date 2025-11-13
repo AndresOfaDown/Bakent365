@@ -244,6 +244,17 @@ def listar_marcas(request):
     return Response(list(marcas), status=status.HTTP_200_OK)
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_marca(request, id):
+    try:
+        marca = Marca.objects.get(id=id)
+        marca.delete()
+        return Response({'mensaje': 'Marca eliminada correctamente.'}, status=status.HTTP_200_OK)
+    except Marca.DoesNotExist:
+        return Response({'error': 'Marca no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+
+
 # ---------- DESCUENTOS ----------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -348,11 +359,103 @@ def listar_garantias(request):
         {
             'id': g.id,
             'producto': g.producto.nombre,
+            'producto_id': g.producto.id,
             'fecha_inicio': g.fecha_inicio,
             'fecha_fin': g.fecha_fin
         } for g in garantias
     ]
     return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_garantia(request, id):
+    try:
+        garantia = Garantia.objects.get(id=id)
+        garantia.delete()
+        return Response(
+            {'mensaje': 'Garantía eliminada correctamente.'},
+            status=status.HTTP_200_OK
+        )
+    except Garantia.DoesNotExist:
+        return Response(
+            {'error': 'Garantía no encontrada.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def actualizar_garantia(request, id):
+    try:
+        garantia = Garantia.objects.get(id=id)
+    except Garantia.DoesNotExist:
+        return Response(
+            {'error': 'Garantía no encontrada.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    serializer = GarantiaSerializer(
+        garantia,
+        data=request.data,
+        partial=True
+    )
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {
+                'mensaje': 'Garantía actualizada correctamente.',
+                'data': serializer.data
+            },
+            status=status.HTTP_200_OK
+        )
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_descuento(request, id):
+    try:
+        descuento = Descuento.objects.get(id=id)
+        descuento.delete()
+        return Response(
+            {'mensaje': 'Descuento eliminado correctamente.'},
+            status=status.HTTP_200_OK
+        )
+    except Descuento.DoesNotExist:
+        return Response(
+            {'error': 'Descuento no encontrado.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def actualizar_descuento(request, id):
+    try:
+        descuento = Descuento.objects.get(id=id)
+    except Descuento.DoesNotExist:
+        return Response(
+            {'error': 'Descuento no encontrado.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    serializer = DescuentoSerializer(
+        descuento,
+        data=request.data,
+        partial=True
+    )
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {
+                'mensaje': 'Descuento actualizado correctamente.',
+                'data': serializer.data
+            },
+            status=status.HTTP_200_OK
+        )
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

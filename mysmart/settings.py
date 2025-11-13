@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -57,6 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'usuarios.middleware.CrearAdminMiddleware',
 ]
 
 ROOT_URLCONF = 'mysmart.urls'
@@ -87,7 +90,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sales365',        #  nombre de tu base de datos
         'USER': 'postgres',              # tu usuario de PostgreSQL
-        'PASSWORD': '61333148',     # tu contraseña
+        'PASSWORD': 'muerte',     # tu contraseña
         'HOST': 'localhost',             # o IP de tu servidor
         'PORT': '5432',                  #  puerto por defecto de PostgreSQL
     }
@@ -149,35 +152,41 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
-from datetime import timedelta
-
 SIMPLE_JWT = {
-    # ⏰ Duración del token de acceso
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),  # ← dura 24 horas
+    # Duración del token de acceso
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),
 
-    # ♻️ Duración del token de refresco
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),  # ← dura 30 días
+    # Duración del token de refresco
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 
     # Opcional: si quieres que el token se renueve al hacer refresh
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
 
-    # Algoritmo de firma
-    #'ALGORITHM': 'HS256',
-    #'SIGNING_KEY': SECRET_KEY,
-
     # Cabecera que se usa para enviar el token
     'AUTH_HEADER_TYPES': ('Bearer',),
-        "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
-
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # React con Vite
     "http://localhost:3000",  # React con CRA
+    "http://127.0.0.1:5173",  # React con Vite (127.0.0.1)
 ]
-# settings.py
-import os
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

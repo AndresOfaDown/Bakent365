@@ -459,14 +459,58 @@ def crear_rol(request):
         # Evitar duplicados
         nombre = serializer.validated_data.get('nombre')
         if Rol.objects.filter(nombre__iexact=nombre).exists():
-            return Response({'error': 'Ya existe un rol con ese nombre.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Ya existe un rol con ese nombre.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         serializer.save()
         return Response({
             'mensaje': 'Rol creado exitosamente.',
             'rol': serializer.data
         }, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_rol(request, id):
+    try:
+        rol = Rol.objects.get(id=id)
+        # Verificar que no sea el rol de Administrador (protección)
+        if rol.id == 1:
+            return Response(
+                {'error': 'No se puede eliminar el rol de Administrador.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        rol.delete()
+        return Response(
+            {'mensaje': 'Rol eliminado correctamente.'},
+            status=status.HTTP_200_OK
+        )
+    except Rol.DoesNotExist:
+        return Response(
+            {'error': 'Rol no encontrado.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_permiso(request, id):
+    try:
+        permiso = Permiso.objects.get(id=id)
+        permiso.delete()
+        return Response(
+            {'mensaje': 'Permiso eliminado correctamente.'},
+            status=status.HTTP_200_OK
+        )
+    except Permiso.DoesNotExist:
+        return Response(
+            {'error': 'Permiso no encontrado.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
