@@ -238,7 +238,7 @@ def crear_marca(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def listar_marcas(request):
     marcas = Marca.objects.all().values('id', 'nombre')
     return Response(list(marcas), status=status.HTTP_200_OK)
