@@ -11,9 +11,16 @@ WORKDIR /app
 # Instalar dependencias del sistema necesarias
 RUN apt-get update && apt-get install -y \
     gcc \
+    g++ \
+    make \
     postgresql-client \
     libpq-dev \
     python3-dev \
+    pkg-config \
+    libcairo2-dev \
+    libgirepository1.0-dev \
+    portaudio19-dev \
+    libportaudio2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requirements.txt
