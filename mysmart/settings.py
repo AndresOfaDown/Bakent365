@@ -31,7 +31,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
-    default='localhost,127.0.0.1,bakent365-production.up.railway.app',
+    default='localhost,127.0.0.1,bakent365-production.up.railway.app,.railway.app,.up.railway.app',
     cast=Csv()
 )
 
