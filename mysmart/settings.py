@@ -216,12 +216,17 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://bakent365-production.up.railway.app',
+    'https://*.railway.app',
+    'https://*.up.railway.app',
+]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Configuración de seguridad para producción
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
